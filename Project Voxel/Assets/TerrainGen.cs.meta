@@ -3,7 +3,19 @@ guid: c70c8d3f5264c5a46921a21523fd7609
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - grass: {fileID: 21300000, guid: 0696c91901672fd489e0a643f6d0cb6d, type: 3}
+  - stone: {fileID: 21300000, guid: 2c541fc2427d715418b37e255fab754b, type: 3}
+  - dirt: {fileID: 21300000, guid: e2e1e792cf0901145aee5d4c918ffecf, type: 3}
+  - oakLog: {fileID: 21300000, guid: e61ff83d12b84784c8c5b2c379a235b5, type: 3}
+  - oakLeaf: {fileID: 21300000, guid: ad6f95fdb6df365458a708384f8fb5af, type: 3}
+  - birchLog: {fileID: 21300000, guid: 877b681b4e476bf4d8e54ca6627b5e45, type: 3}
+  - birchLeaf: {fileID: 21300000, guid: 81ba53b316df9454c9a02f1dfb1c7306, type: 3}
+  - grassTop1: {fileID: 21300000, guid: 829fe7ebd94630c43a780e190c90b961, type: 3}
+  - grassTop2: {fileID: 21300000, guid: 968fa1c56fadc4f46bc19061828e7d69, type: 3}
+  - grassTop3: {fileID: 21300000, guid: 83465b2bb3893fd4f9321d64bc064568, type: 3}
+  - grassTop4: {fileID: 21300000, guid: ae331a75af2e50f4b9892d55e4d44214, type: 3}
+  - noiseTexture: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
