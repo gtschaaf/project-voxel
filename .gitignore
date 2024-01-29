@@ -1,0 +1,11 @@
+# Ignore Unity generated Library folder
+Project Voxel/Library/
+
+# Ignore logs
+Project Voxel/Logs/
+
+# Ignore temporary files and directories
+Project Voxel/Temp/
+
+# Ignore user settings
+Project Voxel/UserSettings/
