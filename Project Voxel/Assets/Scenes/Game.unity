@@ -264,8 +264,9 @@ MonoBehaviour:
   terrainSculptInfluence: 0.25
   generateCaves: 1
   caveFrequency: 0.05
+  chunkSize: 20
+  worldSize: 200
   dirtLayerHeight: 7
-  worldSize: 500
   terrainFrequency: 0.05
   worldHeightMultiplier: 30
   heightAddition: 18
@@ -273,6 +274,7 @@ MonoBehaviour:
   tallGrassClusterChance: 4
   seed: 0
   noiseTexture: {fileID: 0}
+  worldChunks: []
   worldTiles: []
 --- !u!4 &1467776543
 Transform:

@@ -33,9 +33,10 @@ public class TerrainGen : MonoBehaviour
     public bool generateCaves = true;
     public float caveFrequency = 0.05f;
 
-    [Header("Overworld Gen")] 
+    [Header("Overworld Gen")]
+    public int chunkSize = 16;
+    public int worldSize = 200;
     public int dirtLayerHeight = 7;
-    public int worldSize = 500;
     public float terrainFrequency = 0.05f;
     public float worldHeightMultiplier = 5f;
     public int heightAddition = 25;
@@ -46,6 +47,8 @@ public class TerrainGen : MonoBehaviour
     public float seed;
     public Texture2D noiseTexture;
 
+    //Create Array to store each chunk in the world
+    public GameObject[] worldChunks; 
     public List<Vector2> worldTiles = new List<Vector2>();
 
     private void Start()
@@ -54,7 +57,23 @@ public class TerrainGen : MonoBehaviour
         seed = Random.Range(-10000, 10000);
         //Generate Perlin Noise which is utilized to form cave and terrain structures.
         GenerateNoiseTexture();
+        spawnChunks();
         GenerateWorld();
+    }
+
+    public void spawnChunks() {
+        int chunkCt = worldSize / chunkSize;
+        worldChunks = new GameObject[chunkCt];
+        for (int i = 0; i < chunkCt; i++) {
+            //Create chunk game object depending on world size and chunk size
+            GameObject worldChunk = new GameObject();
+            //Rename each game object chunk to make identifying a specific chunk easier 
+            worldChunk.name = i.ToString();
+            //Place chunks underneath world gen in hierarchy 
+            worldChunk.transform.parent = this.transform;
+            //Add each chunk to worldChunks array
+            worldChunks[i] = worldChunk;
+        }
     }
 
     public void GenerateWorld()
@@ -148,7 +167,7 @@ public class TerrainGen : MonoBehaviour
         noiseTexture.Apply();
     }
 
-    void generateOakTree(float x, float y)
+    void generateOakTree(int x, int y)
     {
         //Generate random number of Oak logs to build tree
         int treeHeight = Random.Range(oakTreeMinHeight, oakTreeMaxHeight);
@@ -185,7 +204,7 @@ public class TerrainGen : MonoBehaviour
 
     }
 
-    void generateBirchTree(float x, float y) 
+    void generateBirchTree(int x, int y) 
     {
         //Generate random number of Birch logs to build tree
         int treeHeight = Random.Range(birchTreeMinHeight, birchTreeMaxHeight);
@@ -225,18 +244,28 @@ public class TerrainGen : MonoBehaviour
     
 
 
-    public void placeBlock(Sprite tileSprite, float x, float y) 
+    public void placeBlock(Sprite tileSprite, int x, int y) 
     {
-        //Check to see if a new tile should generate. A higher terrainSculptInfluence will generate more caves. 
-        GameObject newTile = new GameObject();
-        newTile.transform.parent = this.transform;
-        //Automatically create and name gameTiles based on their makeup. 
-        newTile.AddComponent<SpriteRenderer>();
-        newTile.GetComponent<SpriteRenderer>().sprite = tileSprite;
-        newTile.name = tileSprite.name;
-        newTile.transform.position = new Vector2(x + 0.05f, y + 0.05f);
-
-        //Add placed tile to worldTile List. This helps keep track of where blacks are in the world
-        worldTiles.Add(newTile.transform.position);
+        //Check to see if a new tile should generate
+        if (x >= 0 && x <= worldSize && y >= 0 && y <= worldSize)
+        {
+            //Create gameobject to hold new tile 
+            GameObject newTile = new GameObject();
+            //Round to nearest multiple of Chunk Size. Prevents uneven chunk sizes 
+            float chunkCoord = (Mathf.Round(x / chunkSize) * chunkSize);
+            //Find out location of block in chunk 
+            chunkCoord /= chunkSize;
+            newTile.transform.parent = worldChunks[(int)chunkCoord].transform;
+            //Automatically create and name gameTiles based on their makeup. 
+            newTile.AddComponent<SpriteRenderer>();
+            newTile.GetComponent<SpriteRenderer>().sprite = tileSprite;
+            newTile.name = tileSprite.name;
+            newTile.transform.position = new Vector2(x + 0.05f, y + 0.05f);
+            //Add placed tile to worldTile List. This helps keep track of where blacks are in the world
+            worldTiles.Add(newTile.transform.position);
+        }
     }
+
+        
+    
 }
