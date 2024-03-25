@@ -10,7 +10,7 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody2D rb;
     private Animator animator;
 
-    private float horizontal;
+    public float horizontal;
 
     private void Start()
     {
@@ -56,8 +56,8 @@ public class PlayerMovement : MonoBehaviour
             transform.localScale = new Vector3(1, 1, 1);
         }
 
-
-        if (vertical > 0.1f || jump > 0.1f)
+      
+        if ( jump > 0.1f || vertical > 0.1f)
         {
             //Make sure player is on ground before jumping
             if (onGround)
@@ -65,10 +65,12 @@ public class PlayerMovement : MonoBehaviour
                 movement.y = jumpForce;
             }
 
-            //Rb.velocity.y allows character to fall, a value of 0 would cause them to float
-            rb.velocity = movement;
+           
+
 
         }
+        //Rb.velocity.y allows character to fall, a value of 0 would cause them to float
+        rb.velocity = movement;
     }
 
     private void Update()

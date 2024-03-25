@@ -275,7 +275,7 @@ Transform:
   m_GameObject: {fileID: 1078752697}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -1.069, z: 0}
+  m_LocalPosition: {x: 0, y: -1.2, z: 0}
   m_LocalScale: {x: 20, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -305,7 +305,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   movementSpeed: 5
   jumpForce: 12
-  onGround: 1
+  onGround: 0
+  horizontal: 0
 --- !u!70 &1085397737
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -315,7 +316,7 @@ CapsuleCollider2D:
   m_GameObject: {fileID: 1085397733}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 6200000, guid: dddabafbf03781748ac9287b0017211a, type: 2}
+  m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -357,7 +358,7 @@ Rigidbody2D:
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 4
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: dddabafbf03781748ac9287b0017211a, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -634,19 +635,27 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8057341482023264227, guid: 4726a9eb1f4763d49bb01029ebc727a6, type: 3}
+      propertyPath: m_FlipX
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8057341482023264227, guid: 4726a9eb1f4763d49bb01029ebc727a6, type: 3}
+      propertyPath: m_FlipY
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1385608908864908249, guid: 4726a9eb1f4763d49bb01029ebc727a6, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 1085397739}
+    - targetCorrespondingSourceObject: {fileID: 1385608908864908249, guid: 4726a9eb1f4763d49bb01029ebc727a6, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 1085397738}
     - targetCorrespondingSourceObject: {fileID: 1385608908864908249, guid: 4726a9eb1f4763d49bb01029ebc727a6, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1085397737}
-    - targetCorrespondingSourceObject: {fileID: 1385608908864908249, guid: 4726a9eb1f4763d49bb01029ebc727a6, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1085397739}
     - targetCorrespondingSourceObject: {fileID: 1385608908864908249, guid: 4726a9eb1f4763d49bb01029ebc727a6, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1085397736}
