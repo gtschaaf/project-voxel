@@ -333,8 +333,8 @@ public class TerrainGen : MonoBehaviour
             int spriteIndex = Random.Range(0, tileSprites.Length);
             newTile.GetComponent<SpriteRenderer>().sprite = tileSprites[spriteIndex];
             newTile.name = tileSprites[0].name;
-            //Ensure tallgrass objects dont have colliders, this allows player to walk through them
-            if (newTile.name != "grass1") {
+            //Ensure tallgrass and trees dont have colliders, this allows player to walk through them
+            if (newTile.name != "grass1" && newTile.name != "trunk_side" && newTile.name != "trunk_white_side" && newTile.name != "leaves_transparent" && newTile.name != "leaves") {
                 newTile.tag = "Ground";
                 BoxCollider2D boxCollider = new BoxCollider2D();
                 newTile.AddComponent<BoxCollider2D>();
