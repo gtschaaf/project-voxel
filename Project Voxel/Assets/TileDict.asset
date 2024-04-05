@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: TileDict
   m_EditorClassIdentifier: 
   grass: {fileID: 11400000, guid: fd5a3ce02eb87e04cb18fd6385857111, type: 2}
+  tallGrass: {fileID: 11400000, guid: 8242544fd369952449dbb59f25422e83, type: 2}
   stone: {fileID: 11400000, guid: 1c83100fc5dd6f143a5a06b79449cae0, type: 2}
   dirt: {fileID: 11400000, guid: bcd41a977a7abca40ac14574b3395943, type: 2}
   oakLog: {fileID: 11400000, guid: 5c8b7a104ed3f4f46bd5868bebca7d41, type: 2}
@@ -20,10 +21,6 @@ MonoBehaviour:
   birchLog: {fileID: 11400000, guid: 7c5556b976bf04e4ea4056e68f5d3b57, type: 2}
   birchLeaf: {fileID: 11400000, guid: 09a5f20f1f6da704f95651a2d769a172, type: 2}
   coal: {fileID: 11400000, guid: 3ded1e35c0bf3d64284c00349617f53e, type: 2}
-  coalAlt: {fileID: 11400000, guid: 15889ee52e1d6544d9b2fb3f077b9b74, type: 2}
   iron: {fileID: 11400000, guid: 8a68457ff173280459564a314bbe07df, type: 2}
-  ironAlt: {fileID: 11400000, guid: b53f4e07e0dbac94eb2d757e27983aac, type: 2}
   gold: {fileID: 11400000, guid: beaf1229823f3f34da2a1c9f3043efdb, type: 2}
-  goldAlt: {fileID: 11400000, guid: 799f464357f70ca4abbd828c2c427f4e, type: 2}
   diamond: {fileID: 11400000, guid: 03d4466d8a4b2d24a82d4db8397a0f00, type: 2}
-  diamondAlt: {fileID: 11400000, guid: ea5a6236c566d404692d02147ca978ac, type: 2}

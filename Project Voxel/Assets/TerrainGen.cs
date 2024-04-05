@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 
 public class TerrainGen : MonoBehaviour
@@ -16,7 +17,10 @@ public class TerrainGen : MonoBehaviour
     public int oakTreeMinHeight = 4;
     public int birchTreeChance = 5;
     public int birchTreeMaxHeight = 10;
-    public int birchTreeMinHeight = 5; 
+    public int birchTreeMinHeight = 5;
+
+    [Header("Addon Gen")]
+    public int tallGrassChance = 10;
 
     [Header("Cave Gen")]
     //TerrainSculptInfluence is Surface value in video
@@ -31,27 +35,27 @@ public class TerrainGen : MonoBehaviour
     public float terrainFrequency = 0.05f;
     public float worldHeightMultiplier = 5f;
     public int heightAddition = 25;
-    public int tallGrassChance = 10;
-    public int tallGrassClusterChance = 4;
+    
 
     [Header("Seed Gen")] 
     public float seed;
     public Texture2D caveNoiseTexture;
 
     [Header("Ore Gen")]
-    public float coalRarity;
+    public OreClass[] ores;
+    /*public float coalRarity;
     public float coalVeinSize;
     public float ironRarity;
     public float ironVeinSize;
     public float goldRarity;
     public float goldVeinSize;
     public float diamondRarity;
-    public float diamondVeinSize;
+    public float diamondVeinSize;*/
     //Create a perlin noise map for each ore to determine where they will spawn in world. 
-    public Texture2D coalSpread;
+    /*public Texture2D coalSpread;
     public Texture2D ironSpread;
     public Texture2D goldSpread;
-    public Texture2D diamondSpread;
+    public Texture2D diamondSpread;*/
 
     //Create Array to store each chunk in the world
     private GameObject[] worldChunks; 
@@ -59,23 +63,21 @@ public class TerrainGen : MonoBehaviour
 
     private void OnValidate()
     {
-        //Use condition to gurantee perlin noise maps are only generated one time for each world
-        if (caveNoiseTexture == null)
-        {
-            caveNoiseTexture = new Texture2D(worldSize, worldSize);
-            coalSpread = new Texture2D(worldSize, worldSize);
-            ironSpread = new Texture2D(worldSize, worldSize);
-            goldSpread = new Texture2D(worldSize, worldSize);
-            diamondSpread = new Texture2D(worldSize, worldSize);
-        }
+        
+        caveNoiseTexture = new Texture2D(worldSize, worldSize);
+        ores[0].spreadMap = new Texture2D(worldSize, worldSize);
+        ores[1].spreadMap = new Texture2D(worldSize, worldSize);
+        ores[2].spreadMap = new Texture2D(worldSize, worldSize);
+        ores[3].spreadMap = new Texture2D(worldSize, worldSize);
+        
 
         //Generate Perlin Noise which is utilized to form cave and terrain structures.
         GenerateNoiseTexture(caveFrequency, terrainSculptInfluence, caveNoiseTexture);
         //Ore spreads (perlin noise maps)
-        GenerateNoiseTexture(coalRarity, coalVeinSize, coalSpread);
-        GenerateNoiseTexture(ironRarity, ironVeinSize, ironSpread);
-        GenerateNoiseTexture(goldRarity, goldVeinSize, goldSpread);
-        GenerateNoiseTexture(diamondRarity, diamondVeinSize, diamondSpread);
+        GenerateNoiseTexture(ores[0].rarity, ores[0].veinSize, ores[0].spreadMap);
+        GenerateNoiseTexture(ores[1].rarity, ores[1].veinSize, ores[1].spreadMap);
+        GenerateNoiseTexture(ores[2].rarity, ores[2].veinSize, ores[2].spreadMap);
+        GenerateNoiseTexture(ores[3].rarity, ores[3].veinSize, ores[3].spreadMap);
     }
 
     private void Start()
@@ -83,23 +85,22 @@ public class TerrainGen : MonoBehaviour
         //Generate random world seed. This is used to generate random world terrain. 
         seed = Random.Range(-10000, 10000);
         //Use condition to gurantee perlin noise maps are only generated one time for each world
-        if (caveNoiseTexture == null)
-        {
-            caveNoiseTexture = new Texture2D(worldSize, worldSize);
-            coalSpread = new Texture2D(worldSize, worldSize);
-            ironSpread = new Texture2D(worldSize, worldSize);
-            goldSpread = new Texture2D(worldSize, worldSize);
-            diamondSpread = new Texture2D(worldSize, worldSize);
-        }
+        
+        caveNoiseTexture = new Texture2D(worldSize, worldSize);
+        ores[0].spreadMap = new Texture2D(worldSize, worldSize);
+        ores[1].spreadMap = new Texture2D(worldSize, worldSize);
+        ores[2].spreadMap = new Texture2D(worldSize, worldSize);
+        ores[3].spreadMap = new Texture2D(worldSize, worldSize);
+        
 
      
         //Generate Perlin Noise which is utilized to form cave and terrain structures.
         GenerateNoiseTexture(caveFrequency, terrainSculptInfluence, caveNoiseTexture);
         //Ore spreads (perlin noise maps)
-        GenerateNoiseTexture(coalRarity, coalVeinSize, coalSpread);
-        GenerateNoiseTexture(ironRarity, ironVeinSize, ironSpread);
-        GenerateNoiseTexture(goldRarity, goldVeinSize, goldSpread);
-        GenerateNoiseTexture(diamondRarity, diamondVeinSize, diamondSpread);
+        GenerateNoiseTexture(ores[0].rarity, ores[0].veinSize, ores[0].spreadMap);
+        GenerateNoiseTexture(ores[1].rarity, ores[1].veinSize, ores[1].spreadMap);
+        GenerateNoiseTexture(ores[2].rarity, ores[2].veinSize, ores[2].spreadMap);
+        GenerateNoiseTexture(ores[3].rarity, ores[3].veinSize, ores[3].spreadMap);
         spawnChunks();
         GenerateWorld();
     }
@@ -129,44 +130,32 @@ public class TerrainGen : MonoBehaviour
 
             for (int y = 0; y < height; y++)
             {
-                Sprite tileSprite;
+                Sprite[] tileSprites;
                 //Start generating stone after dirtLayerHeigh is passed. 
                 if (y < height - dirtLayerHeight)
                 {
-                    int tileChoice = Random.Range(1, 3);
-                    if (coalSpread.GetPixel(x, y).r > 0.5f)
-                        if(tileChoice == 1)
-                            tileSprite = tileDict.coal.tileSprite;
-                        else
-                            tileSprite = tileDict.coalAlt.tileSprite;
-                    else if (ironSpread.GetPixel(x, y).r > 0.5f)
-                        if (tileChoice == 1)
-                            tileSprite = tileDict.iron.tileSprite;
-                        else
-                            tileSprite = tileDict.ironAlt.tileSprite;
-                    else if (goldSpread.GetPixel(x, y).r > 0.5f)
-                        if (tileChoice == 1)
-                            tileSprite = tileDict.gold.tileSprite;
-                        else
-                            tileSprite = tileDict.goldAlt.tileSprite;
-                    else if (diamondSpread.GetPixel(x, y).r > 0.5f)
-                        if (tileChoice == 1)
-                            tileSprite = tileDict.diamond.tileSprite;
-                        else
-                            tileSprite = tileDict.diamondAlt.tileSprite;
-                    else
-                        tileSprite = tileDict.stone.tileSprite;
+                    tileSprites = tileDict.stone.tileSprites;
+
+                    if (ores[0].spreadMap.GetPixel(x, y).r > 0.5f && height - y > ores[0].maxSpawnHeight)
+                            tileSprites = tileDict.coal.tileSprites;                       
+                    if (ores[1].spreadMap.GetPixel(x, y).r > 0.5f && height - y > ores[1].maxSpawnHeight)                        
+                            tileSprites = tileDict.iron.tileSprites;                      
+                    if (ores[2].spreadMap.GetPixel(x, y).r > 0.5f && height - y > ores[2].maxSpawnHeight)                       
+                            tileSprites = tileDict.gold.tileSprites;                      
+                    if (ores[3].spreadMap.GetPixel(x, y).r > 0.5f && height - y > ores[3].maxSpawnHeight)
+                            tileSprites = tileDict.diamond.tileSprites;
+                      
 
                 }
                 //Spawn dirt layer
                 else if (y < height - 1)
                 {
-                    tileSprite = tileDict.dirt.tileSprite;
+                    tileSprites = tileDict.dirt.tileSprites;
                 }
                 else 
                 {
                     //Spawn grass on top block of world
-                    tileSprite = tileDict.grass.tileSprite;
+                    tileSprites = tileDict.grass.tileSprites;
                    
         
                 }
@@ -177,12 +166,12 @@ public class TerrainGen : MonoBehaviour
 
                     if (caveNoiseTexture.GetPixel(x, y).r > 0.5f)
                     {
-                        placeBlock(tileSprite, x, y);
+                        placeBlock(tileSprites, x, y);
                     }
                 }
                 else 
                 {
-                    placeBlock(tileSprite, x, y);
+                    placeBlock(tileSprites, x, y);
                 }
                 //Roll  to see if tree generates 
                 //Check to make sure tree doesnt spawn floating
@@ -192,18 +181,30 @@ public class TerrainGen : MonoBehaviour
                     if (t == 1)
                     {
                         //Generate tree
-                        if (worldTiles.Contains(new Vector2(x +0.05f, y+0.05f))) 
-                        {   
+                        if (worldTiles.Contains(new Vector2(x + 0.05f, y + 0.05f)))
+                        {
                             if (Random.Range(0, birchTreeChance) == 1)
                             {
                                 generateBirchTree(x, y + 1);
                             }
-                            else 
+                            else
                             {
                                 generateOakTree(x, y + 1);
 
                             }
                         }
+                    }
+                    else { 
+                        int i = Random.Range(0, tallGrassChance);
+                        if (i == 1) {
+                            //Generate tall grass and mushrooms
+                            if (worldTiles.Contains(new Vector2(x + 0.05f, y + 0.05f)))
+                            {
+                                placeBlock(tileDict.tallGrass.tileSprites, x, y + 1);
+                            }
+                        }
+                        
+
                     }
                 }
             }
@@ -236,33 +237,33 @@ public class TerrainGen : MonoBehaviour
         int treeHeight = Random.Range(oakTreeMinHeight, oakTreeMaxHeight);
         for (int i = 0; i < treeHeight; i++) 
         {
-            placeBlock(tileDict.oakLog.tileSprite, x, y+i);
+            placeBlock(tileDict.oakLog.tileSprites, x, y+i);
             
         }
         //Generate tree leaves based on height of tree
-        placeBlock(tileDict.oakLeaf.tileSprite, x, y + treeHeight);
-        placeBlock(tileDict.oakLeaf.tileSprite, x + 1, y + treeHeight);
-        placeBlock(tileDict.oakLeaf.tileSprite, x - 1, y + treeHeight);
-        placeBlock(tileDict.oakLeaf.tileSprite, x, y + treeHeight + 1);
-        placeBlock(tileDict.oakLeaf.tileSprite, x + 1, y + treeHeight + 1);
-        placeBlock(tileDict.oakLeaf.tileSprite, x - 1, y + treeHeight + 1);
-        placeBlock(tileDict.oakLeaf.tileSprite, x, y + treeHeight + 2);
+        placeBlock(tileDict.oakLeaf.tileSprites, x, y + treeHeight);
+        placeBlock(tileDict.oakLeaf.tileSprites, x + 1, y + treeHeight);
+        placeBlock(tileDict.oakLeaf.tileSprites, x - 1, y + treeHeight);
+        placeBlock(tileDict.oakLeaf.tileSprites, x, y + treeHeight + 1);
+        placeBlock(tileDict.oakLeaf.tileSprites, x + 1, y + treeHeight + 1);
+        placeBlock(tileDict.oakLeaf.tileSprites, x - 1, y + treeHeight + 1);
+        placeBlock(tileDict.oakLeaf.tileSprites, x, y + treeHeight + 2);
 
         //Add more leaves if tree is taller than set value 
         if (treeHeight > 8) {
-            placeBlock(tileDict.oakLeaf.tileSprite, x, y + treeHeight + 3);
-            placeBlock(tileDict.oakLeaf.tileSprite, x-1, y + treeHeight + 3);
-            placeBlock(tileDict.oakLeaf.tileSprite, x+1, y + treeHeight + 3);
-            placeBlock(tileDict.oakLeaf.tileSprite, x - 2, y + treeHeight);
-            placeBlock(tileDict.oakLeaf.tileSprite, x + 2, y + treeHeight);
-            placeBlock(tileDict.oakLeaf.tileSprite, x - 3, y + treeHeight);
-            placeBlock(tileDict.oakLeaf.tileSprite, x + 3, y + treeHeight);
-            placeBlock(tileDict.oakLeaf.tileSprite, x - 2, y + treeHeight+ 1);
-            placeBlock(tileDict.oakLeaf.tileSprite, x + 2, y + treeHeight+ 1);
-            placeBlock(tileDict.oakLeaf.tileSprite, x, y + treeHeight + 4);
-            placeBlock(tileDict.oakLeaf.tileSprite, x, y + treeHeight + 5);
-            placeBlock(tileDict.oakLeaf.tileSprite, x + 1, y + treeHeight +2);
-            placeBlock(tileDict.oakLeaf.tileSprite, x - 1, y + treeHeight +2);
+            placeBlock(tileDict.oakLeaf.tileSprites, x, y + treeHeight + 3);
+            placeBlock(tileDict.oakLeaf.tileSprites, x-1, y + treeHeight + 3);
+            placeBlock(tileDict.oakLeaf.tileSprites, x+1, y + treeHeight + 3);
+            placeBlock(tileDict.oakLeaf.tileSprites, x - 2, y + treeHeight);
+            placeBlock(tileDict.oakLeaf.tileSprites, x + 2, y + treeHeight);
+            placeBlock(tileDict.oakLeaf.tileSprites, x - 3, y + treeHeight);
+            placeBlock(tileDict.oakLeaf.tileSprites, x + 3, y + treeHeight);
+            placeBlock(tileDict.oakLeaf.tileSprites, x - 2, y + treeHeight+ 1);
+            placeBlock(tileDict.oakLeaf.tileSprites, x + 2, y + treeHeight+ 1);
+            placeBlock(tileDict.oakLeaf.tileSprites, x, y + treeHeight + 4);
+            placeBlock(tileDict.oakLeaf.tileSprites, x, y + treeHeight + 5);
+            placeBlock(tileDict.oakLeaf.tileSprites, x + 1, y + treeHeight +2);
+            placeBlock(tileDict.oakLeaf.tileSprites, x - 1, y + treeHeight +2);
         }
 
     }
@@ -273,33 +274,33 @@ public class TerrainGen : MonoBehaviour
         int treeHeight = Random.Range(birchTreeMinHeight, birchTreeMaxHeight);
         for (int i = 0; i < treeHeight; i++)
         {
-            placeBlock(tileDict.birchLog.tileSprite, x, y + i);
+            placeBlock(tileDict.birchLog.tileSprites, x, y + i);
         }
         //Generate tree leaves based on height of tree
-        placeBlock(tileDict.birchLeaf.tileSprite, x, y + treeHeight);
-        placeBlock(tileDict.birchLeaf.tileSprite, x + 1, y + treeHeight);
-        placeBlock(tileDict.birchLeaf.tileSprite, x - 1, y + treeHeight);
-        placeBlock(tileDict.birchLeaf.tileSprite, x, y + treeHeight + 1);
-        placeBlock(tileDict.birchLeaf.tileSprite, x + 1, y + treeHeight + 1);
-        placeBlock(tileDict.birchLeaf.tileSprite, x - 1, y + treeHeight + 1);
-        placeBlock(tileDict.birchLeaf.tileSprite, x, y + treeHeight + 2);
+        placeBlock(tileDict.birchLeaf.tileSprites, x, y + treeHeight);
+        placeBlock(tileDict.birchLeaf.tileSprites, x + 1, y + treeHeight);
+        placeBlock(tileDict.birchLeaf.tileSprites, x - 1, y + treeHeight);
+        placeBlock(tileDict.birchLeaf.tileSprites, x, y + treeHeight + 1);
+        placeBlock(tileDict.birchLeaf.tileSprites, x + 1, y + treeHeight + 1);
+        placeBlock(tileDict.birchLeaf.tileSprites, x - 1, y + treeHeight + 1);
+        placeBlock(tileDict.birchLeaf.tileSprites, x, y + treeHeight + 2);
 
         //Add more leaves if tree is taller than set value 
         if (treeHeight > 8)
         {
-            placeBlock(tileDict.birchLeaf.tileSprite, x, y + treeHeight + 3);
-            placeBlock(tileDict.birchLeaf.tileSprite, x - 1, y + treeHeight + 3);
-            placeBlock(tileDict.birchLeaf.tileSprite, x + 1, y + treeHeight + 3);
-            placeBlock(tileDict.birchLeaf.tileSprite, x - 2, y + treeHeight);
-            placeBlock(tileDict.birchLeaf.tileSprite, x + 2, y + treeHeight);
-            placeBlock(tileDict.birchLeaf.tileSprite, x - 3, y + treeHeight);
-            placeBlock(tileDict.birchLeaf.tileSprite, x + 3, y + treeHeight);
-            placeBlock(tileDict.birchLeaf.tileSprite, x - 2, y + treeHeight + 1);
-            placeBlock(tileDict.birchLeaf.tileSprite, x + 2, y + treeHeight + 1);
-            placeBlock(tileDict.birchLeaf.tileSprite, x, y + treeHeight + 4);
-            placeBlock(tileDict.birchLeaf.tileSprite, x, y + treeHeight + 5);
-            placeBlock(tileDict.birchLeaf.tileSprite, x + 1, y + treeHeight + 2);
-            placeBlock(tileDict.birchLeaf.tileSprite, x - 1, y + treeHeight + 2);
+            placeBlock(tileDict.birchLeaf.tileSprites, x, y + treeHeight + 3);
+            placeBlock(tileDict.birchLeaf.tileSprites, x - 1, y + treeHeight + 3);
+            placeBlock(tileDict.birchLeaf.tileSprites, x + 1, y + treeHeight + 3);
+            placeBlock(tileDict.birchLeaf.tileSprites, x - 2, y + treeHeight);
+            placeBlock(tileDict.birchLeaf.tileSprites, x + 2, y + treeHeight);
+            placeBlock(tileDict.birchLeaf.tileSprites, x - 3, y + treeHeight);
+            placeBlock(tileDict.birchLeaf.tileSprites, x + 3, y + treeHeight);
+            placeBlock(tileDict.birchLeaf.tileSprites, x - 2, y + treeHeight + 1);
+            placeBlock(tileDict.birchLeaf.tileSprites, x + 2, y + treeHeight + 1);
+            placeBlock(tileDict.birchLeaf.tileSprites, x, y + treeHeight + 4);
+            placeBlock(tileDict.birchLeaf.tileSprites, x, y + treeHeight + 5);
+            placeBlock(tileDict.birchLeaf.tileSprites, x + 1, y + treeHeight + 2);
+            placeBlock(tileDict.birchLeaf.tileSprites, x - 1, y + treeHeight + 2);
         }
 
     }
@@ -307,7 +308,7 @@ public class TerrainGen : MonoBehaviour
     
 
 
-    public void placeBlock(Sprite tileSprite, int x, int y) 
+    public void placeBlock(Sprite[] tileSprites, int x, int y) 
     {
         //Check to see if a new tile should generate
         if (x >= 0 && x <= worldSize && y >= 0 && y <= worldSize)
@@ -321,8 +322,10 @@ public class TerrainGen : MonoBehaviour
             newTile.transform.parent = worldChunks[(int)chunkCoord].transform;
             //Automatically create and name gameTiles based on their makeup. 
             newTile.AddComponent<SpriteRenderer>();
-            newTile.GetComponent<SpriteRenderer>().sprite = tileSprite;
-            newTile.name = tileSprite.name;
+
+            int spriteIndex = Random.Range(0, tileSprites.Length);
+            newTile.GetComponent<SpriteRenderer>().sprite = tileSprites[spriteIndex];
+            newTile.name = tileSprites[0].name;
             newTile.transform.position = new Vector2(x + 0.05f, y + 0.05f);
             //Add placed tile to worldTile List. This helps keep track of where blacks are in the world
             worldTiles.Add(newTile.transform.position);

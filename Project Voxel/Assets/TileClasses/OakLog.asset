@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: OakLog
   m_EditorClassIdentifier: 
   tileName: OakLog
-  tileSprite: {fileID: 21300000, guid: e61ff83d12b84784c8c5b2c379a235b5, type: 3}
-  tileRarity: 0
+  tileSprites:
+  - {fileID: 21300000, guid: e61ff83d12b84784c8c5b2c379a235b5, type: 3}
