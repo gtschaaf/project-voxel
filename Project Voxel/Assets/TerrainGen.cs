@@ -135,6 +135,7 @@ public class TerrainGen : MonoBehaviour
                 if (y < height - dirtLayerHeight)
                 {
                     tileSprites = tileDict.stone.tileSprites;
+                    
 
                     if (ores[0].spreadMap.GetPixel(x, y).r > 0.5f && height - y > ores[0].maxSpawnHeight)
                             tileSprites = tileDict.coal.tileSprites;                       
@@ -156,6 +157,7 @@ public class TerrainGen : MonoBehaviour
                 {
                     //Spawn grass on top block of world
                     tileSprites = tileDict.grass.tileSprites;
+                   
                    
         
                 }
@@ -315,6 +317,11 @@ public class TerrainGen : MonoBehaviour
         {
             //Create gameobject to hold new tile 
             GameObject newTile = new GameObject();
+            //Add ground tag to each placed tile 
+            //Add 2d box collider to each placed tile
+            //These 2 allow for playerBody to correctly detect when its on the ground
+           
+           
             //Round to nearest multiple of Chunk Size. Prevents uneven chunk sizes 
             float chunkCoord = (Mathf.Round(x / chunkSize) * chunkSize);
             //Find out location of block in chunk 
@@ -326,6 +333,12 @@ public class TerrainGen : MonoBehaviour
             int spriteIndex = Random.Range(0, tileSprites.Length);
             newTile.GetComponent<SpriteRenderer>().sprite = tileSprites[spriteIndex];
             newTile.name = tileSprites[0].name;
+            //Ensure tallgrass objects dont have colliders, this allows player to walk through them
+            if (newTile.name != "grass1") {
+                newTile.tag = "Ground";
+                BoxCollider2D boxCollider = new BoxCollider2D();
+                newTile.AddComponent<BoxCollider2D>();
+            }
             newTile.transform.position = new Vector2(x + 0.05f, y + 0.05f);
             //Add placed tile to worldTile List. This helps keep track of where blacks are in the world
             worldTiles.Add(newTile.transform.position);
