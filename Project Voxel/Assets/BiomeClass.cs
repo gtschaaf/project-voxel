@@ -5,7 +5,10 @@ using UnityEngine;
 public class BiomeClass 
 {
     public string biomeName;
-    public Color biomeColor;
+
+    public Color biomeCol;
+
+    public TileDict tileDict;
 
     [Header("Noise Settings")]
     public float terrainFrequency = 0.05f;

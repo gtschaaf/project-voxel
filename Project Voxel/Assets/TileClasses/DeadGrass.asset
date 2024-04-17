@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b6536de2dcbc874590ee312b7bf531c, type: 3}
+  m_Name: DeadGrass
+  m_EditorClassIdentifier: 
+  tileName: DeadGrass
+  tileSprites:
+  - {fileID: 21300000, guid: 92fdc6713770ed1479ae65b198c15040, type: 3}
+  - {fileID: 21300000, guid: 972b9a8734af89740b8ffbcae3bd6165, type: 3}

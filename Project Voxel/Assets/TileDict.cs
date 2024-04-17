@@ -17,6 +17,7 @@ public class TileDict : ScriptableObject
     public TileClass birchLeaf;
     public TileClass snow;
     public TileClass sand;
+    public TileClass cactus;
 
     [Header("Ores")]
     public TileClass coal;

@@ -41,7 +41,7 @@ public class TerrainGen : MonoBehaviour
     //Biomes implemented same as caves using Perlin Noise. With each 'cave' being a biome
     [Header("Biomes")]
     public float biomeRarity;
-    public Gradient biomeColors;
+    public Gradient biomeGradient;
     public Texture2D biomeMap;
 
     [Header("Seed Gen")] 
@@ -53,12 +53,14 @@ public class TerrainGen : MonoBehaviour
     //Create Array to store each chunk in the world
     private GameObject[] worldChunks; 
     public List<Vector2> worldTiles = new List<Vector2>();
+    private BiomeClass curBiome;
 
     private void OnValidate()
     {
+       
         DrawTextures();
-    }
 
+    }
     private void Start()
     {
         //Generate random world seed. This is used to generate random world terrain. 
@@ -100,7 +102,7 @@ public class TerrainGen : MonoBehaviour
             {
                 //(y+seed) * biome rarity: makes it so biomes can spawn at different y levels aswell. 
                 float v = Mathf.PerlinNoise((x + seed) * biomeRarity, (y+seed) * biomeRarity);
-                Color color = biomeColors.Evaluate(v);
+                Color color = biomeGradient.Evaluate(v);
                 //Insert color value into array based on randomly generated noise texture 
                 //This color value is used to generate caves, ores, and biomes
                 biomeMap.SetPixel(x, y, color);
@@ -126,21 +128,41 @@ public class TerrainGen : MonoBehaviour
         }
     }
 
+    public BiomeClass GetCurrentBiome(int x, int y) 
+    {
+        //Change curBiome value here
+        //Search through biomes 
+        for (int i = 0; i < biomes.Length; i++) 
+        {
+            
+            if (biomes[i].biomeCol == biomeMap.GetPixel(x,y)) 
+            {
+                return biomes[i];              
+            }
+
+        }
+        return curBiome;
+    }
+
     public void GenerateWorld()
     {
+        Sprite[] tileSprites;
         //For loop representing x axis (width) of world
         for (int x = 0; x < worldSize; x++)
         {
-            float height = Mathf.PerlinNoise((x + seed) * terrainFrequency, seed * terrainFrequency) * worldHeightMultiplier + heightAddition;
+            curBiome = GetCurrentBiome(x, 0);
+            float height = Mathf.PerlinNoise((x + seed) * curBiome.terrainFrequency, seed * curBiome.terrainFrequency) * curBiome.worldHeightMultiplier + heightAddition;
             //For loop representing y axis (height) of world
 
             for (int y = 0; y < height; y++)
             {
-                Sprite[] tileSprites;
+                curBiome = GetCurrentBiome(x, y);
+
                 //Start generating stone after dirtLayerHeigh is passed. 
                 if (y < height - dirtLayerHeight)
                 {
-                    tileSprites = tileDict.stone.tileSprites;
+
+                    tileSprites = curBiome.tileDict.stone.tileSprites;
                     
 
                     if (ores[0].spreadMap.GetPixel(x, y).r > 0.5f && height - y > ores[0].maxSpawnHeight)
@@ -157,12 +179,12 @@ public class TerrainGen : MonoBehaviour
                 //Spawn dirt layer
                 else if (y < height - 1)
                 {
-                    tileSprites = tileDict.dirt.tileSprites;
+                    tileSprites = curBiome.tileDict.dirt.tileSprites;
                 }
                 else 
                 {
                     //Spawn grass on top block of world
-                    tileSprites = tileDict.grass.tileSprites;
+                    tileSprites = curBiome.tileDict.grass.tileSprites;
                    
                    
         
@@ -185,7 +207,7 @@ public class TerrainGen : MonoBehaviour
                 //Check to make sure tree doesnt spawn floating
                 if (y >= height-1)
                 {
-                    int t = Random.Range(0, genTreeChance);
+                    int t = Random.Range(0, curBiome.genTreeChance);
                     if (t == 1)
                     {
                         //Generate tree
@@ -193,22 +215,25 @@ public class TerrainGen : MonoBehaviour
                         {
                             if (Random.Range(0, birchTreeChance) == 1)
                             {
-                                generateBirchTree(x, y + 1);
+                                generateBirchTree(Random.Range(curBiome.birchTreeMinHeight, curBiome.birchTreeMaxHeight), x, y + 1);
                             }
                             else
                             {
-                                generateOakTree(x, y + 1);
+                                generateOakTree(Random.Range(curBiome.oakTreeMinHeight, curBiome.oakTreeMaxHeight), x, y + 1);
 
                             }
                         }
                     }
                     else { 
-                        int i = Random.Range(0, tallGrassChance);
+                        int i = Random.Range(0, curBiome.tallGrassChance);
                         if (i == 1) {
-                            //Generate tall grass and mushrooms
+                            //Generate tall grass and mushrooms and stones
                             if (worldTiles.Contains(new Vector2(x + 0.05f, y + 0.05f)))
                             {
-                                placeBlock(tileDict.tallGrass.tileSprites, x, y + 1);
+                                if (curBiome.tileDict.tallGrass != null)
+                                {
+                                    placeBlock(curBiome.tileDict.tallGrass.tileSprites, x, y + 1);
+                                }
                             }
                         }
                         
@@ -239,10 +264,9 @@ public class TerrainGen : MonoBehaviour
         noiseTexture.Apply();
     }
 
-    void generateOakTree(int x, int y)
+    void generateOakTree(int treeHeight, int x, int y)
     {
         //Generate random number of Oak logs to build tree
-        int treeHeight = Random.Range(oakTreeMinHeight, oakTreeMaxHeight);
         for (int i = 0; i < treeHeight; i++) 
         {
             placeBlock(tileDict.oakLog.tileSprites, x, y+i);
@@ -276,10 +300,9 @@ public class TerrainGen : MonoBehaviour
 
     }
 
-    void generateBirchTree(int x, int y) 
+    void generateBirchTree(int treeHeight, int x, int y) 
     {
         //Generate random number of Birch logs to build tree
-        int treeHeight = Random.Range(birchTreeMinHeight, birchTreeMaxHeight);
         for (int i = 0; i < treeHeight; i++)
         {
             placeBlock(tileDict.birchLog.tileSprites, x, y + i);
