@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class TileDict : ScriptableObject
 {
-    [Header("Tile Dictionary")]
+    [Header("Nature")]
     public TileClass grass;
     public TileClass tallGrass;
     public TileClass stone;
@@ -15,6 +15,10 @@ public class TileDict : ScriptableObject
     public TileClass oakLeaf;
     public TileClass birchLog;
     public TileClass birchLeaf;
+    public TileClass snow;
+    public TileClass sand;
+
+    [Header("Ores")]
     public TileClass coal;
     public TileClass iron;
     public TileClass gold;

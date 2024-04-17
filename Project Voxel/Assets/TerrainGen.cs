@@ -9,8 +9,10 @@ public class TerrainGen : MonoBehaviour
 {
     [Header("Tile Dictionary")]
     public TileDict tileDict;
+    public float seed;
 
-
+    public BiomeClass[] biomes;
+    
     [Header("Tree Gen")]
     public int genTreeChance = 10;
     public int oakTreeMaxHeight = 30;
@@ -35,27 +37,18 @@ public class TerrainGen : MonoBehaviour
     public float terrainFrequency = 0.05f;
     public float worldHeightMultiplier = 5f;
     public int heightAddition = 25;
-    
+
+    //Biomes implemented same as caves using Perlin Noise. With each 'cave' being a biome
+    [Header("Biomes")]
+    public float biomeRarity;
+    public Gradient biomeColors;
+    public Texture2D biomeMap;
 
     [Header("Seed Gen")] 
-    public float seed;
     public Texture2D caveNoiseTexture;
 
     [Header("Ore Gen")]
     public OreClass[] ores;
-    /*public float coalRarity;
-    public float coalVeinSize;
-    public float ironRarity;
-    public float ironVeinSize;
-    public float goldRarity;
-    public float goldVeinSize;
-    public float diamondRarity;
-    public float diamondVeinSize;*/
-    //Create a perlin noise map for each ore to determine where they will spawn in world. 
-    /*public Texture2D coalSpread;
-    public Texture2D ironSpread;
-    public Texture2D goldSpread;
-    public Texture2D diamondSpread;*/
 
     //Create Array to store each chunk in the world
     private GameObject[] worldChunks; 
@@ -63,49 +56,62 @@ public class TerrainGen : MonoBehaviour
 
     private void OnValidate()
     {
-        
-        caveNoiseTexture = new Texture2D(worldSize, worldSize);
-        ores[0].spreadMap = new Texture2D(worldSize, worldSize);
-        ores[1].spreadMap = new Texture2D(worldSize, worldSize);
-        ores[2].spreadMap = new Texture2D(worldSize, worldSize);
-        ores[3].spreadMap = new Texture2D(worldSize, worldSize);
-        
-
-        //Generate Perlin Noise which is utilized to form cave and terrain structures.
-        GenerateNoiseTexture(caveFrequency, terrainSculptInfluence, caveNoiseTexture);
-        //Ore spreads (perlin noise maps)
-        GenerateNoiseTexture(ores[0].rarity, ores[0].veinSize, ores[0].spreadMap);
-        GenerateNoiseTexture(ores[1].rarity, ores[1].veinSize, ores[1].spreadMap);
-        GenerateNoiseTexture(ores[2].rarity, ores[2].veinSize, ores[2].spreadMap);
-        GenerateNoiseTexture(ores[3].rarity, ores[3].veinSize, ores[3].spreadMap);
+        DrawTextures();
     }
 
     private void Start()
     {
         //Generate random world seed. This is used to generate random world terrain. 
         seed = Random.Range(-10000, 10000);
-        //Use condition to gurantee perlin noise maps are only generated one time for each world
-        
-        caveNoiseTexture = new Texture2D(worldSize, worldSize);
-        ores[0].spreadMap = new Texture2D(worldSize, worldSize);
-        ores[1].spreadMap = new Texture2D(worldSize, worldSize);
-        ores[2].spreadMap = new Texture2D(worldSize, worldSize);
-        ores[3].spreadMap = new Texture2D(worldSize, worldSize);
-        
-
-     
-        //Generate Perlin Noise which is utilized to form cave and terrain structures.
-        GenerateNoiseTexture(caveFrequency, terrainSculptInfluence, caveNoiseTexture);
-        //Ore spreads (perlin noise maps)
-        GenerateNoiseTexture(ores[0].rarity, ores[0].veinSize, ores[0].spreadMap);
-        GenerateNoiseTexture(ores[1].rarity, ores[1].veinSize, ores[1].spreadMap);
-        GenerateNoiseTexture(ores[2].rarity, ores[2].veinSize, ores[2].spreadMap);
-        GenerateNoiseTexture(ores[3].rarity, ores[3].veinSize, ores[3].spreadMap);
+        DrawTextures();
         spawnChunks();
         GenerateWorld();
     }
 
-    public void spawnChunks() {
+    public void DrawTextures() 
+    {
+        biomeMap = new Texture2D(worldSize, worldSize);
+        drawBiomeTexture();
+        for (int i = 0; i < biomes.Length; i++)
+        {
+            biomes[i].caveNoiseTexture = new Texture2D(worldSize, worldSize);
+            for (int o = 0; o < biomes[i].ores.Length; o++)
+            {
+
+                biomes[i].ores[o].spreadMap = new Texture2D(worldSize, worldSize);
+            }
+            GenerateNoiseTexture(biomes[i].caveFrequency, biomes[i].terrainFrequency, biomes[i].caveNoiseTexture); 
+            //Generate ore perlin noise maps
+            for (int o = 0; o < biomes[i].ores.Length; o++)
+            {
+
+                GenerateNoiseTexture(biomes[i].ores[o].rarity, biomes[i].ores[o].veinSize, biomes[i].ores[o].spreadMap);
+
+            }                     
+        }       
+    }
+
+    public void drawBiomeTexture() 
+    {
+
+        for (int x = 0; x < biomeMap.width; x++)
+        {
+            for (int y = 0; y < biomeMap.height; y++)
+            {
+                //(y+seed) * biome rarity: makes it so biomes can spawn at different y levels aswell. 
+                float v = Mathf.PerlinNoise((x + seed) * biomeRarity, (y+seed) * biomeRarity);
+                Color color = biomeColors.Evaluate(v);
+                //Insert color value into array based on randomly generated noise texture 
+                //This color value is used to generate caves, ores, and biomes
+                biomeMap.SetPixel(x, y, color);
+            }
+
+            biomeMap.Apply();
+        }
+    }
+
+    public void spawnChunks() 
+    {
         int chunkCt = worldSize / chunkSize;
         worldChunks = new GameObject[chunkCt];
         for (int i = 0; i < chunkCt; i++) {
@@ -312,36 +318,42 @@ public class TerrainGen : MonoBehaviour
 
     public void placeBlock(Sprite[] tileSprites, int x, int y) 
     {
-        //Check to see if a new tile should generate
-        if (x >= 0 && x <= worldSize && y >= 0 && y <= worldSize)
+        //Check to see if tile is already placed in location
+        //This prevents player from placing blocks on existing blocks
+        if (!worldTiles.Contains(new Vector2Int(x, y)))
         {
-            //Create gameobject to hold new tile 
-            GameObject newTile = new GameObject();
-            //Add ground tag to each placed tile 
-            //Add 2d box collider to each placed tile
-            //These 2 allow for playerBody to correctly detect when its on the ground
-           
-           
-            //Round to nearest multiple of Chunk Size. Prevents uneven chunk sizes 
-            float chunkCoord = (Mathf.Round(x / chunkSize) * chunkSize);
-            //Find out location of block in chunk 
-            chunkCoord /= chunkSize;
-            newTile.transform.parent = worldChunks[(int)chunkCoord].transform;
-            //Automatically create and name gameTiles based on their makeup. 
-            newTile.AddComponent<SpriteRenderer>();
+            //Check to see if a new tile should generate
+            if (x >= 0 && x <= worldSize && y >= 0 && y <= worldSize)
+            {
+                //Create gameobject to hold new tile 
+                GameObject newTile = new GameObject();
+                //Add ground tag to each placed tile 
+                //Add 2d box collider to each placed tile
+                //These 2 allow for playerBody to correctly detect when its on the ground
 
-            int spriteIndex = Random.Range(0, tileSprites.Length);
-            newTile.GetComponent<SpriteRenderer>().sprite = tileSprites[spriteIndex];
-            newTile.name = tileSprites[0].name;
-            //Ensure tallgrass and trees dont have colliders, this allows player to walk through them
-            if (newTile.name != "grass1" && newTile.name != "trunk_side" && newTile.name != "trunk_white_side" && newTile.name != "leaves_transparent" && newTile.name != "leaves") {
-                newTile.tag = "Ground";
-                BoxCollider2D boxCollider = new BoxCollider2D();
-                newTile.AddComponent<BoxCollider2D>();
+
+                //Round to nearest multiple of Chunk Size. Prevents uneven chunk sizes 
+                float chunkCoord = (Mathf.Round(x / chunkSize) * chunkSize);
+                //Find out location of block in chunk 
+                chunkCoord /= chunkSize;
+                newTile.transform.parent = worldChunks[(int)chunkCoord].transform;
+                //Automatically create and name gameTiles based on their makeup. 
+                newTile.AddComponent<SpriteRenderer>();
+
+                int spriteIndex = Random.Range(0, tileSprites.Length);
+                newTile.GetComponent<SpriteRenderer>().sprite = tileSprites[spriteIndex];
+                newTile.name = tileSprites[0].name;
+                //Ensure tallgrass and trees dont have colliders, this allows player to walk through them
+                if (newTile.name != "grass1" && newTile.name != "trunk_side" && newTile.name != "trunk_white_side" && newTile.name != "leaves_transparent" && newTile.name != "leaves")
+                {
+                    newTile.tag = "Ground";
+                    BoxCollider2D boxCollider = new BoxCollider2D();
+                    newTile.AddComponent<BoxCollider2D>();
+                }
+                newTile.transform.position = new Vector2(x + 0.05f, y + 0.05f);
+                //Add placed tile to worldTile List. This helps keep track of where blacks are in the world
+                worldTiles.Add(newTile.transform.position);
             }
-            newTile.transform.position = new Vector2(x + 0.05f, y + 0.05f);
-            //Add placed tile to worldTile List. This helps keep track of where blacks are in the world
-            worldTiles.Add(newTile.transform.position);
         }
     }
 

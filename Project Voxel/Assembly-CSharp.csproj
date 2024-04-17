@@ -63,6 +63,7 @@
     <Compile Include="Assets\TileClass.cs" />
     <Compile Include="Assets\OreClass.cs" />
     <Compile Include="Assets\TerrainGen.cs" />
+    <Compile Include="Assets\BiomeClass.cs" />
     <Compile Include="Assets\PlayerMovement\CameraController.cs" />
     <Compile Include="Assets\PlayerMovement\PlayerMovement.cs" />
     <Compile Include="Assets\TileDict.cs" />

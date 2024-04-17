@@ -20,6 +20,8 @@ MonoBehaviour:
   oakLeaf: {fileID: 11400000, guid: e98f9ced73e53d842927f8afb3a323dc, type: 2}
   birchLog: {fileID: 11400000, guid: 7c5556b976bf04e4ea4056e68f5d3b57, type: 2}
   birchLeaf: {fileID: 11400000, guid: 09a5f20f1f6da704f95651a2d769a172, type: 2}
+  snow: {fileID: 11400000, guid: d0f9d333f20dbc246a0e56269ed06ca6, type: 2}
+  sand: {fileID: 11400000, guid: 2b679891b7bfef043ab66654c55da685, type: 2}
   coal: {fileID: 11400000, guid: 3ded1e35c0bf3d64284c00349617f53e, type: 2}
   iron: {fileID: 11400000, guid: 8a68457ff173280459564a314bbe07df, type: 2}
   gold: {fileID: 11400000, guid: beaf1229823f3f34da2a1c9f3043efdb, type: 2}
