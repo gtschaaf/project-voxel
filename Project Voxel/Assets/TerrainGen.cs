@@ -12,28 +12,31 @@ public class TerrainGen : MonoBehaviour
     public float seed;
 
     public BiomeClass[] biomes;
-    
-    [Header("Tree Gen")]
+
+    //Commented out because implemented per biome 
+    /*[Header("Tree Gen")]
     public int genTreeChance = 10;
     public int oakTreeMaxHeight = 30;
     public int oakTreeMinHeight = 4;
     public int birchTreeChance = 5;
     public int birchTreeMaxHeight = 10;
-    public int birchTreeMinHeight = 5;
+    public int birchTreeMinHeight = 5;*/
 
-    [Header("Addon Gen")]
-    public int tallGrassChance = 10;
+    //Commented out because implemented per biome 
+    /*[Header("Addon Gen")]
+    public int tallGrassChance = 10;*/
 
     [Header("Cave Gen")]
     //TerrainSculptInfluence is Surface value in video
     public float terrainSculptInfluence = 0.25f;
     public bool generateCaves = true;
-    public float caveFrequency = 0.05f;
+    //public float caveFrequency = 0.05f;
 
     [Header("Overworld Gen")]
     public int chunkSize = 16;
     public int worldSize = 200;
-    public int dirtLayerHeight = 7;
+    //Commented out because implemented per biome 
+    //public int dirtLayerHeight = 7;
     public float terrainFrequency = 0.05f;
     public float worldHeightMultiplier = 5f;
     public int heightAddition = 25;
@@ -55,21 +58,63 @@ public class TerrainGen : MonoBehaviour
     public List<Vector2> worldTiles = new List<Vector2>();
     private BiomeClass curBiome;
 
+    //All this function does is constantly refreshes unity editor. This is helpful for seeing perlin noise maps change when values are edited. 
     private void OnValidate()
-    {
-       
+    {      
         DrawTextures();
-
+        DrawCavesAndOres();
     }
     private void Start()
     {
         //Generate random world seed. This is used to generate random world terrain. 
         seed = Random.Range(-10000, 10000);
         DrawTextures();
+        DrawCavesAndOres();
         spawnChunks();
         GenerateWorld();
     }
 
+    public void DrawCavesAndOres()
+    {
+        for (int x = 0; x < worldSize; x++)
+        {
+            for (int y = 0; y < worldSize; y++)
+            {
+                curBiome = GetCurrentBiome(x, y);
+                float v = Mathf.PerlinNoise((x + seed) * curBiome.caveFrequency, (y + seed) * curBiome.caveFrequency);
+
+                //Insert color value into array based on randomly generated noise texture 
+                //This color value is used to generate cave and ore spreads
+                if (v > curBiome.terrainSculptInfluence)
+                    caveNoiseTexture.SetPixel(x, y, Color.white);
+                else
+                    caveNoiseTexture.SetPixel(x, y, Color.black);
+            }
+        }
+
+        
+        for (int x = 0; x < worldSize; x++)
+        {
+            for (int y = 0; y < worldSize; y++)
+            {
+                for (int i = 0; i < curBiome.ores.Length; i++)
+                {
+                    curBiome = GetCurrentBiome(x, y);
+                    float v = Mathf.PerlinNoise((x + seed) * curBiome.ores[i].rarity, (y + seed) * curBiome.ores[i].rarity);
+
+                    //Insert color value into array based on randomly generated noise texture 
+                    //This color value is used to generate cave and ore spreads
+                    if (v > curBiome.ores[i].veinSize)
+                      ores[i].spreadMap.SetPixel(x, y, Color.white);
+                    else
+                     ores[i].spreadMap.SetPixel(x, y, Color.black);
+                    ores[i].spreadMap.Apply();
+                }
+            }
+        }
+        caveNoiseTexture.Apply();
+    }
+    //This function draws the perlin map and displays it in Unity editor
     public void DrawTextures() 
     {
         biomeMap = new Texture2D(worldSize, worldSize);
@@ -159,7 +204,7 @@ public class TerrainGen : MonoBehaviour
                 curBiome = GetCurrentBiome(x, y);
 
                 //Start generating stone after dirtLayerHeigh is passed. 
-                if (y < height - dirtLayerHeight)
+                if (y < height - curBiome.dirtLayerHeight)
                 {
 
                     tileSprites = curBiome.tileDict.stone.tileSprites;
@@ -213,7 +258,7 @@ public class TerrainGen : MonoBehaviour
                         //Generate tree
                         if (worldTiles.Contains(new Vector2(x + 0.05f, y + 0.05f)))
                         {
-                            if (Random.Range(0, birchTreeChance) == 1)
+                            if (Random.Range(0, curBiome.birchTreeChance) == 1)
                             {
                                 generateBirchTree(Random.Range(curBiome.birchTreeMinHeight, curBiome.birchTreeMaxHeight), x, y + 1);
                             }

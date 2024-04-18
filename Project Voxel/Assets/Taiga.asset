@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   grass: {fileID: 11400000, guid: d0f9d333f20dbc246a0e56269ed06ca6, type: 2}
   tallGrass: {fileID: 0}
-  stone: {fileID: 11400000, guid: 1c83100fc5dd6f143a5a06b79449cae0, type: 2}
+  stone: {fileID: 11400000, guid: d0f9d333f20dbc246a0e56269ed06ca6, type: 2}
   dirt: {fileID: 11400000, guid: d0f9d333f20dbc246a0e56269ed06ca6, type: 2}
   oakLog: {fileID: 0}
   oakLeaf: {fileID: 0}
@@ -22,6 +22,7 @@ MonoBehaviour:
   birchLeaf: {fileID: 0}
   snow: {fileID: 0}
   sand: {fileID: 0}
+  cactus: {fileID: 0}
   coal: {fileID: 0}
   iron: {fileID: 0}
   gold: {fileID: 0}
