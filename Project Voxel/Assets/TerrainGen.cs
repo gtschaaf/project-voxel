@@ -59,22 +59,22 @@ public class TerrainGen : MonoBehaviour
     private BiomeClass curBiome;
 
     //All this function does is constantly refreshes unity editor. This is helpful for seeing perlin noise maps change when values are edited. 
-    private void OnValidate()
+   /* private void OnValidate()
     {      
         DrawTextures();
         DrawCavesAndOres();
-    }
+    }*/
     private void Start()
     {
         //Generate random world seed. This is used to generate random world terrain. 
         seed = Random.Range(-10000, 10000);
         DrawTextures();
-        DrawCavesAndOres();
+        //DrawCavesAndOres();
         spawnChunks();
         GenerateWorld();
     }
 
-    public void DrawCavesAndOres()
+    /*public void DrawCavesAndOres()
     {
         for (int x = 0; x < worldSize; x++)
         {
@@ -113,7 +113,9 @@ public class TerrainGen : MonoBehaviour
             }
         }
         caveNoiseTexture.Apply();
-    }
+    }*/
+
+
     //This function draws the perlin map and displays it in Unity editor
     public void DrawTextures() 
     {
