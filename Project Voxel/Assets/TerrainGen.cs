@@ -72,9 +72,10 @@ public class TerrainGen : MonoBehaviour
         DrawTextures();
         spawnChunks();
         GenerateWorld();
+        player.Spawn();
+
         cam.Spawn(new Vector3(player.spawnPoint.x, player.spawnPoint.y, cam.transform.position.z));
         cam.worldSize = worldSize;
-        player.Spawn();
     }
 
 
@@ -164,7 +165,7 @@ public class TerrainGen : MonoBehaviour
 
             if (x == worldSize / 2) 
             {
-                player.spawnPoint = new Vector2(x, height + 1);
+                player.spawnPoint = new Vector2(x, height + 10);
             }
             //For loop representing y axis (height) of world
 
