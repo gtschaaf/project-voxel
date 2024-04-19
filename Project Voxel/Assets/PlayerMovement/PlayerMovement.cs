@@ -11,9 +11,11 @@ public class PlayerMovement : MonoBehaviour
     private Animator animator;
 
     public float horizontal;
+    public  Vector2 spawnPoint;
 
-    private void Start()
+    public void Spawn()
     {
+        GetComponent<Transform>().position = spawnPoint;
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
     }

@@ -7,6 +7,8 @@ using UnityEngine.Rendering;
 
 public class TerrainGen : MonoBehaviour
 {
+    public PlayerMovement player;
+    public CamController cam;
     [Header("Tile Dictionary")]
     public TileDict tileDict;
     public float seed;
@@ -59,61 +61,21 @@ public class TerrainGen : MonoBehaviour
     private BiomeClass curBiome;
 
     //All this function does is constantly refreshes unity editor. This is helpful for seeing perlin noise maps change when values are edited. 
-   /* private void OnValidate()
-    {      
+    private void OnValidate()
+    {
         DrawTextures();
-        DrawCavesAndOres();
-    }*/
+    }
     private void Start()
     {
         //Generate random world seed. This is used to generate random world terrain. 
         seed = Random.Range(-10000, 10000);
         DrawTextures();
-        //DrawCavesAndOres();
         spawnChunks();
         GenerateWorld();
+        cam.Spawn(new Vector3(player.spawnPoint.x, player.spawnPoint.y, cam.transform.position.z));
+        cam.worldSize = worldSize;
+        player.Spawn();
     }
-
-    /*public void DrawCavesAndOres()
-    {
-        for (int x = 0; x < worldSize; x++)
-        {
-            for (int y = 0; y < worldSize; y++)
-            {
-                curBiome = GetCurrentBiome(x, y);
-                float v = Mathf.PerlinNoise((x + seed) * curBiome.caveFrequency, (y + seed) * curBiome.caveFrequency);
-
-                //Insert color value into array based on randomly generated noise texture 
-                //This color value is used to generate cave and ore spreads
-                if (v > curBiome.terrainSculptInfluence)
-                    caveNoiseTexture.SetPixel(x, y, Color.white);
-                else
-                    caveNoiseTexture.SetPixel(x, y, Color.black);
-            }
-        }
-
-        
-        for (int x = 0; x < worldSize; x++)
-        {
-            for (int y = 0; y < worldSize; y++)
-            {
-                for (int i = 0; i < curBiome.ores.Length; i++)
-                {
-                    curBiome = GetCurrentBiome(x, y);
-                    float v = Mathf.PerlinNoise((x + seed) * curBiome.ores[i].rarity, (y + seed) * curBiome.ores[i].rarity);
-
-                    //Insert color value into array based on randomly generated noise texture 
-                    //This color value is used to generate cave and ore spreads
-                    if (v > curBiome.ores[i].veinSize)
-                      ores[i].spreadMap.SetPixel(x, y, Color.white);
-                    else
-                     ores[i].spreadMap.SetPixel(x, y, Color.black);
-                    ores[i].spreadMap.Apply();
-                }
-            }
-        }
-        caveNoiseTexture.Apply();
-    }*/
 
 
     //This function draws the perlin map and displays it in Unity editor
@@ -199,6 +161,11 @@ public class TerrainGen : MonoBehaviour
         {
             curBiome = GetCurrentBiome(x, 0);
             float height = Mathf.PerlinNoise((x + seed) * curBiome.terrainFrequency, seed * curBiome.terrainFrequency) * curBiome.worldHeightMultiplier + heightAddition;
+
+            if (x == worldSize / 2) 
+            {
+                player.spawnPoint = new Vector2(x, height + 1);
+            }
             //For loop representing y axis (height) of world
 
             for (int y = 0; y < height; y++)
@@ -390,7 +357,7 @@ public class TerrainGen : MonoBehaviour
     {
         //Check to see if tile is already placed in location
         //This prevents player from placing blocks on existing blocks
-        if (!worldTiles.Contains(new Vector2Int(x, y)))
+        if (!worldTiles.Contains(new Vector2Int(x, y)) && x>= 0 && x<= worldSize && y >= 0 && y<= worldSize)
         {
             //Check to see if a new tile should generate
             if (x >= 0 && x <= worldSize && y >= 0 && y <= worldSize)
@@ -412,9 +379,11 @@ public class TerrainGen : MonoBehaviour
 
                 int spriteIndex = Random.Range(0, tileSprites.Length);
                 newTile.GetComponent<SpriteRenderer>().sprite = tileSprites[spriteIndex];
+                newTile.GetComponent<SpriteRenderer>().sortingOrder = -5;
+
                 newTile.name = tileSprites[0].name;
                 //Ensure tallgrass and trees dont have colliders, this allows player to walk through them
-                if (newTile.name != "grass1" && newTile.name != "trunk_side" && newTile.name != "trunk_white_side" && newTile.name != "leaves_transparent" && newTile.name != "leaves")
+                if (newTile.name != "grass1" && newTile.name != "trunk_side" && newTile.name != "trunk_white_side" && newTile.name != "leaves_transparent" && newTile.name != "leaves" && newTile.name != "grass_brown" && newTile.name != "grass_tan")
                 {
                     newTile.tag = "Ground";
                     BoxCollider2D boxCollider = new BoxCollider2D();
