@@ -11,7 +11,12 @@ public class PlayerMovement : MonoBehaviour
     private Animator animator;
 
     public float horizontal;
+    public bool swing;
     public  Vector2 spawnPoint;
+
+    public Vector2Int mousePos;
+
+    public TerrainGen terrainGenerator;
 
     public void Spawn()
     {
@@ -50,6 +55,13 @@ public class PlayerMovement : MonoBehaviour
         float vertical = Input.GetAxisRaw("Vertical");
 
         Vector2 movement = new Vector2(horizontal * movementSpeed, rb.velocity.y);
+        //Left click is 0
+        swing = Input.GetMouseButton(0);
+
+        if (swing) 
+        {
+            terrainGenerator.breakBlock(mousePos.x, mousePos.y);
+        }
 
         if (horizontal > 0) {
             transform.localScale = new Vector3(-1, 1, 1);
@@ -77,7 +89,12 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        //set mouse position
+        mousePos.x = Mathf.RoundToInt(Camera.main.ScreenToWorldPoint(Input.mousePosition).x + 0.5f);
+        mousePos.y = Mathf.RoundToInt(Camera.main.ScreenToWorldPoint(Input.mousePosition).y + 0.5f);
+
         animator.SetFloat("Horizontal", horizontal);
+        animator.SetBool("swing", swing);
     }
 
 }

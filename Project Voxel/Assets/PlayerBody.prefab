@@ -156,7 +156,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 5ad121652517a064c809e167dc53bcd9, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -371,10 +371,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 666e4f1d8548d0240991b5e2a2258fe7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementSpeed: 5
-  jumpForce: 12
+  movementSpeed: 10
+  jumpForce: 15
   onGround: 0
   horizontal: 0
+  swing: 0
+  spawnPoint: {x: 0, y: 0}
+  mousePos: {x: 0, y: 0}
+  terrainGenerator: {fileID: 0}
 --- !u!95 &6266083751556523619
 Animator:
   serializedVersion: 5

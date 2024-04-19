@@ -15,18 +15,6 @@ public class TerrainGen : MonoBehaviour
 
     public BiomeClass[] biomes;
 
-    //Commented out because implemented per biome 
-    /*[Header("Tree Gen")]
-    public int genTreeChance = 10;
-    public int oakTreeMaxHeight = 30;
-    public int oakTreeMinHeight = 4;
-    public int birchTreeChance = 5;
-    public int birchTreeMaxHeight = 10;
-    public int birchTreeMinHeight = 5;*/
-
-    //Commented out because implemented per biome 
-    /*[Header("Addon Gen")]
-    public int tallGrassChance = 10;*/
 
     [Header("Cave Gen")]
     //TerrainSculptInfluence is Surface value in video
@@ -37,8 +25,6 @@ public class TerrainGen : MonoBehaviour
     [Header("Overworld Gen")]
     public int chunkSize = 16;
     public int worldSize = 200;
-    //Commented out because implemented per biome 
-    //public int dirtLayerHeight = 7;
     public float terrainFrequency = 0.05f;
     public float worldHeightMultiplier = 5f;
     public int heightAddition = 25;
@@ -56,8 +42,10 @@ public class TerrainGen : MonoBehaviour
     public OreClass[] ores;
 
     //Create Array to store each chunk in the world
-    private GameObject[] worldChunks; 
+    public GameObject[] worldChunks; 
     public List<Vector2> worldTiles = new List<Vector2>();
+    //Holds actual game object for each tile in world
+    public List<GameObject> worldTileObjects = new List<GameObject>();
     private BiomeClass curBiome;
 
     //All this function does is constantly refreshes unity editor. This is helpful for seeing perlin noise maps change when values are edited. 
@@ -351,7 +339,15 @@ public class TerrainGen : MonoBehaviour
 
     }
 
-    
+    public void breakBlock(int x, int y)
+    {
+        //Check if block exists in world before breaking it
+        if (worldTiles.Contains(new Vector2Int(x, y)) && x >= 0 && x <= worldSize && y >= 0 && y <= worldSize)
+        {
+            //Search array of world tile objects to find block at x and y axis being clicked on. 
+            Destroy(worldTileObjects[worldTiles.IndexOf(new Vector2(x, y))]);
+        }
+    }
 
 
     public void placeBlock(Sprite[] tileSprites, int x, int y) 
@@ -390,13 +386,12 @@ public class TerrainGen : MonoBehaviour
                     BoxCollider2D boxCollider = new BoxCollider2D();
                     newTile.AddComponent<BoxCollider2D>();
                 }
-                newTile.transform.position = new Vector2(x + 0.05f, y + 0.05f);
+                newTile.transform.position = new Vector2(x, y);
                 //Add placed tile to worldTile List. This helps keep track of where blacks are in the world
                 worldTiles.Add(newTile.transform.position);
+                worldTileObjects.Add(newTile);
+
             }
         }
-    }
-
-        
-    
+    }  
 }
