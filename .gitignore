@@ -1,6 +1,9 @@
 # Ignore Unity generated Library folder
 Project Voxel/Library/
 
+#Ignore 
+Project Voxel/.vs/Project Voxel
+
 # Ignore logs
 Project Voxel/Logs/
 
