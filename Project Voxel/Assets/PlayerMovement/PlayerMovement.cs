@@ -90,8 +90,8 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         //set mouse position
-        mousePos.x = Mathf.RoundToInt(Camera.main.ScreenToWorldPoint(Input.mousePosition).x + 0.5f);
-        mousePos.y = Mathf.RoundToInt(Camera.main.ScreenToWorldPoint(Input.mousePosition).y + 0.5f);
+        mousePos.x = Mathf.RoundToInt(Camera.main.ScreenToWorldPoint(Input.mousePosition).x);
+        mousePos.y = Mathf.RoundToInt(Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
 
         animator.SetFloat("Horizontal", horizontal);
         animator.SetBool("swing", swing);

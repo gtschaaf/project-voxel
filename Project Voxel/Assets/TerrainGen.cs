@@ -175,7 +175,7 @@ public class TerrainGen : MonoBehaviour
 
             if (x == worldSize / 2) 
             {
-                player.spawnPoint = new Vector2(x, height + 10);
+                player.spawnPoint = new Vector2(x, height + 15);
             }
             //For loop representing y axis (height) of world
 
@@ -236,7 +236,7 @@ public class TerrainGen : MonoBehaviour
                     if (t == 1)
                     {
                         //Generate tree
-                        if (worldTiles.Contains(new Vector2(x + 0.05f, y + 0.05f)))
+                        if (worldTiles.Contains(new Vector2(x, y)))
                         {
                             if (Random.Range(0, curBiome.birchTreeChance) == 1)
                             {
@@ -253,7 +253,7 @@ public class TerrainGen : MonoBehaviour
                         int i = Random.Range(0, curBiome.tallGrassChance);
                         if (i == 1) {
                             //Generate tall grass and mushrooms and stones
-                            if (worldTiles.Contains(new Vector2(x + 0.05f, y + 0.05f)))
+                            if (worldTiles.Contains(new Vector2(x , y)))
                             {
                                 if (curBiome.tileDict.tallGrass != null)
                                 {
@@ -401,6 +401,7 @@ public class TerrainGen : MonoBehaviour
                 newTile.GetComponent<SpriteRenderer>().sortingOrder = -5;
 
                 newTile.name = tileSprites[0].name;
+                
                 //Ensure tallgrass and trees dont have colliders, this allows player to walk through them
                 if (newTile.name != "grass1" && newTile.name != "trunk_side" && newTile.name != "trunk_white_side" && newTile.name != "leaves_transparent" && newTile.name != "leaves" && newTile.name != "grass_brown" && newTile.name != "grass_tan")
                 {
