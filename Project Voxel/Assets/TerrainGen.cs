@@ -368,6 +368,9 @@ public class TerrainGen : MonoBehaviour
         {
             //Search array of world tile objects to find block at x and y axis being clicked on. 
             Destroy(worldTileObjects[worldTiles.IndexOf(new Vector2(x, y))]);
+            //Remove tile from world tiles array. Without this, blocks can not be placed in spots where previously placed blocks have been destroyed.   
+            worldTileObjects.RemoveAt(worldTiles.IndexOf(new Vector2(x, y)));
+            worldTiles.RemoveAt(worldTiles.IndexOf(new Vector2(x, y)));
         }
     }
 

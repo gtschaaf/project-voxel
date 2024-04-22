@@ -12,11 +12,14 @@ public class PlayerMovement : MonoBehaviour
 
     public float horizontal;
     public bool swing;
+    public bool place;
     public  Vector2 spawnPoint;
 
     public Vector2Int mousePos;
 
     public TerrainGen terrainGenerator;
+    public TileClass tileInHand;
+    public int tileReach;
 
     public void Spawn()
     {
@@ -57,10 +60,18 @@ public class PlayerMovement : MonoBehaviour
         Vector2 movement = new Vector2(horizontal * movementSpeed, rb.velocity.y);
         //Left click is 0
         swing = Input.GetMouseButton(0);
-
-        if (swing) 
+        place = Input.GetMouseButton(1);
+        //Prevent player from placing and destroying blocks too far away from them
+        if (Vector2.Distance(transform.position, mousePos) <= tileReach)
         {
-            terrainGenerator.breakBlock(mousePos.x, mousePos.y);
+            if (swing)
+            {
+                terrainGenerator.breakBlock(mousePos.x, mousePos.y);
+            }
+            else if (place)
+            {
+                terrainGenerator.placeBlock(tileInHand.tileSprites, mousePos.x, mousePos.y);
+            }
         }
 
         if (horizontal > 0) {
@@ -94,7 +105,7 @@ public class PlayerMovement : MonoBehaviour
         mousePos.y = Mathf.RoundToInt(Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
 
         animator.SetFloat("Horizontal", horizontal);
-        animator.SetBool("swing", swing);
+        animator.SetBool("swing", swing || place);
     }
 
 }
