@@ -73,39 +73,29 @@ public class PlayerMovement : MonoBehaviour
                 terrainGenerator.placeBlock(tileInHand.tileSprites, mousePos.x, mousePos.y);
             }
         }
-
         if (horizontal > 0) {
             transform.localScale = new Vector3(-1, 1, 1);
         }
         else if(horizontal < 0) {
             transform.localScale = new Vector3(1, 1, 1);
-        }
-
-      
+        }   
         if ( jump > 0.1f || vertical > 0.1f)
         {
             //Make sure player is on ground before jumping
             if (onGround)
             {
                 movement.y = jumpForce;
-            }
-
-           
-
-
+            }        
         }
         //Rb.velocity.y allows character to fall, a value of 0 would cause them to float
         rb.velocity = movement;
     }
-
     private void Update()
     {
         //set mouse position
         mousePos.x = Mathf.RoundToInt(Camera.main.ScreenToWorldPoint(Input.mousePosition).x);
         mousePos.y = Mathf.RoundToInt(Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
-
         animator.SetFloat("Horizontal", horizontal);
         animator.SetBool("swing", swing || place);
     }
-
 }
