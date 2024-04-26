@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -185,7 +186,7 @@ public class TerrainGen : MonoBehaviour
             if (x == worldSize / 2) 
             {
                 //Set player spawn point to middle of world
-                player.spawnPoint = new Vector2(x, height + 15);
+                player.spawnPoint = new Vector2(x, height + 25);
             }
             //For loop representing y axis (height) of world
             for (int y = 0; y < height; y++)
@@ -241,7 +242,7 @@ public class TerrainGen : MonoBehaviour
                     {
                         //Generate tree. Check to see tree will generate on existing tile
                         if (worldTiles.Contains(new Vector2(x, y)))
-                        {
+                        {                        
                             //Set rare chance for tree to spawn as a birch tree
                             if (Random.Range(0, curBiome.birchTreeChance) == 1)
                             {
@@ -258,9 +259,9 @@ public class TerrainGen : MonoBehaviour
                     else { 
                         int i = Random.Range(0, curBiome.tallGrassChance);
                         if (i == 1) {
-                            //Generate tall grass and mushrooms and stones
+                            //Generate tall grass and mushrooms stones and cacti
                             if (worldTiles.Contains(new Vector2(x , y)))
-                            {
+                            {                              
                                 if (curBiome.tileDict.tallGrass != null)
                                 {
                                     //Place tall grass tile based on biome. Desert has dead grass. Taiga has no tall grass. 
@@ -370,6 +371,8 @@ public class TerrainGen : MonoBehaviour
         }
 
     }
+
+   
 
     public void breakBlock(int x, int y)
     {
