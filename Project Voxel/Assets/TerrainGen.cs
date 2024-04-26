@@ -377,13 +377,18 @@ public class TerrainGen : MonoBehaviour
     public void breakBlock(int x, int y)
     {
         //Check if block exists in world before breaking it
-        if (worldTiles.Contains(new Vector2Int(x, y)) && x >= 0 && x <= worldSize && y >= 0 && y <= worldSize)
+        if (worldTiles.Contains(new Vector2Int(x, y)) && x >= 0 && x <= worldSize && y >= 0 && y <= worldSize && !IsOnMapEdge(x, y))
         {
             //Search array of world tile objects to find block at x and y axis being clicked on. 
             Destroy(worldTileObjects[worldTiles.IndexOf(new Vector2(x, y))]);
             //Remove tile from world tiles array. Without this, blocks can not be placed in spots where previously placed blocks have been destroyed.   
             worldTileObjects.RemoveAt(worldTiles.IndexOf(new Vector2(x, y)));
             worldTiles.RemoveAt(worldTiles.IndexOf(new Vector2(x, y)));
+        }
+        // Function to check if a block is on the edge of the map
+        bool IsOnMapEdge(int x, int y)
+        {
+            return x == 0 || x == worldSize - 1 || y == 0 || y == worldSize - 1;
         }
     }
 
